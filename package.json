@@ -1,0 +1,46 @@
+{
+  "name": "customer-reports",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/generate-redirects.js && vite",
+    "build": "node scripts/generate-redirects.js && tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "@reduxjs/toolkit": "^2.11.2",
+    "antd": "^5.24.0",
+    "async-mutex": "^0.5.0",
+    "dayjs": "^1.11.19",
+    "logrocket": "^12.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-number-format": "^5.4.4",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "6.26.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.9",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-basic-ssl": "^1.2.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.3",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "npm:rolldown-vite@7.2.5"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.2.5"
+  }
+}
