@@ -126,6 +126,8 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
         style={{
           height: 'calc(100dvh - 64px)',
           width: '100dvw',
+          minHeight: 0,
+          overflow: 'auto',
         }}
       >
         {children}
