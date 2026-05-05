@@ -26,7 +26,7 @@ const rawBaseQuery = fetchBaseQuery({
     headers.set('content-type', 'application/json');
     return headers;
   },
-  credentials: 'include',
+  credentials: 'include', //questo fa sì cheil browser includa i cookie nelle richieste, necessario per l'autenticazione basata su cookie
 });
 
 const baseQuery: BaseQueryFn<
