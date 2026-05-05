@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: riskapp-postgres
+    environment:
+      POSTGRES_DB: riskapp
+      POSTGRES_USER: riskapp
+      POSTGRES_PASSWORD: riskapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - riskapp_postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: riskapp-redis
+    ports:
+      - "6379:6379"
+  
+  backend:
+    build:
+      context: ./backend
+    container_name: riskapp-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      POSTGRES_DB: riskapp
+      POSTGRES_USER: riskapp
+      POSTGRES_PASSWORD: riskapp
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+    depends_on:
+      - postgres
+      - redis
+
+
+volumes:
+  riskapp_postgres_data:
