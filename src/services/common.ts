@@ -1,34 +1,29 @@
 import { baseApi } from './api';
+import {
+  authPaths,
+  type DataResponse,
+  type User,
+} from '../lib/riskapp-client';
 
-type CreateLogoutRequest = void;
-type CreateLogoutResponse = void;
-
-export interface User {
-  uuid: string;
-  username: string;
-  is_active: boolean;
-  email: string;
-  first_name: string | null;
-  last_name: string | null;
-}
+export type { User } from '../lib/riskapp-client';
 
 type GetUserRequest = void;
 type GetUserResponse = User;
 
 const commonApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    logout: builder.mutation<CreateLogoutRequest, CreateLogoutResponse>({
+    logout: builder.mutation<void, void>({
       query: () => ({
-        url: '/auth/logout/',
+        url: authPaths.logout,
         method: 'POST',
       }),
     }),
     getUser: builder.query<GetUserResponse, GetUserRequest>({
       query: () => ({
-        url: '/me/',
+        url: authPaths.me,
         method: 'GET',
       }),
-      transformResponse: (response: { data: User }) => response.data,
+      transformResponse: (response: DataResponse<User>) => response.data,
     }),
   }),
 });

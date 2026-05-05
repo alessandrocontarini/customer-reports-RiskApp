@@ -1,37 +1,24 @@
 import { publicApi } from './api';
-
-type CreateLoginResponse = { detail: string };
-type CreateLoginRequest = { username: string; password: string };
-
-type RegisterResponse = {
-  data: {
-    id: number;
-    email: string;
-    first_name: string | null;
-    last_name: string | null;
-  };
-};
-
-type RegisterRequest = {
-  email: string;
-  password: string;
-  password_confirm: string;
-  first_name: string;
-  last_name: string;
-};
+import {
+  authPaths,
+  type LoginRequest,
+  type LoginResponse,
+  type RegisterRequest,
+  type RegisterResponse,
+} from '../lib/riskapp-client';
 
 const authApi = publicApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<CreateLoginResponse, CreateLoginRequest>({
+    login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: '/auth/login/',
+        url: authPaths.login,
         method: 'POST',
         body: { ...credentials },
       }),
     }),
     register: builder.mutation<RegisterResponse, RegisterRequest>({
       query: (body) => ({
-        url: '/auth/register/',
+        url: authPaths.register,
         method: 'POST',
         body,
       }),

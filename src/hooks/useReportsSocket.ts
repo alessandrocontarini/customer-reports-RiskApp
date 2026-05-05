@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import {
+  parseReportsSocketMessage,
+  reportStatusSubscriptions,
+  serializeReportsSocketMessage,
+  type ReportsSocketState,
+} from '../lib/riskapp-client';
 import { baseApi } from '../services/api';
 import { useAppDispatch } from '../store/hooks';
-
-type SocketState = 'connecting' | 'connected' | 'authenticated' | 'closed';
 
 const getWsUrl = () => {
   if (import.meta.env.VITE_REPORT_WS_URL) {
@@ -14,29 +18,31 @@ const getWsUrl = () => {
 
 export const useReportsSocket = (enabled: boolean) => {
   const dispatch = useAppDispatch();
-  const [state, setState] = useState<SocketState>('closed');
+  const [state, setState] = useState<ReportsSocketState>('closed');
   const [lastMessage, setLastMessage] = useState<string>('Nessun evento live');
 
   useEffect(() => {
     if (!enabled) return;
 
     const socket = new WebSocket(getWsUrl());
+    setState('connecting');
 
     socket.addEventListener('open', () => {
       setState('connected');
-      socket.send(JSON.stringify({ type: 'auth' }));
+      socket.send(serializeReportsSocketMessage({ type: 'auth' }));
     });
 
     socket.addEventListener('message', (event) => {
-      const message = JSON.parse(event.data);
+      const message = parseReportsSocketMessage(event.data);
+      if (!message) return;
 
       if (message.type === 'auth.success') {
         setState('authenticated');
         socket.send(
-          JSON.stringify({
+          serializeReportsSocketMessage({
             type: 'subscribe',
             filters: {
-              report_statuses: ['pending', 'running', 'completed', 'failed'],
+              report_statuses: reportStatusSubscriptions,
             },
           }),
         );
