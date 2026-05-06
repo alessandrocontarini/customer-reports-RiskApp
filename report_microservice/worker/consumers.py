@@ -2,6 +2,8 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.conf import settings
 
+from .crypto import encrypt_socket_message, import_rsa_public_key_from_jwk
+
 try:
     import requests
 except ImportError:  # pragma: no cover
@@ -12,6 +14,7 @@ class ReportsConsumer(JsonWebsocketConsumer):
     def connect(self) -> None:
         self.user_id = None
         self.group_name = None
+        self.public_key = None
         self.accept()
 
     def disconnect(self, close_code: int) -> None:
@@ -25,6 +28,7 @@ class ReportsConsumer(JsonWebsocketConsumer):
         message_type = content.get("type")
 
         if message_type == "auth":
+            self._set_public_key(content.get("public_key"))
             self._authenticate_with_backend_cookie()
             return
 
@@ -50,7 +54,23 @@ class ReportsConsumer(JsonWebsocketConsumer):
             return
 
     def report_message(self, event: dict) -> None:
-        self.send_json(event["message"])
+        message = event["message"]
+
+        if self.public_key is None:
+            self.send_json(message)
+            return
+
+        self.send_json(encrypt_socket_message(self.public_key, message))
+
+    def _set_public_key(self, public_key_jwk) -> None:
+        if not public_key_jwk:
+            self.public_key = None
+            return
+
+        try:
+            self.public_key = import_rsa_public_key_from_jwk(public_key_jwk)
+        except (KeyError, TypeError, ValueError):
+            self.public_key = None
 
     def _authenticate_with_backend_cookie(self) -> None:
         if requests is None:

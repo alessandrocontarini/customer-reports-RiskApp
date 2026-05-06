@@ -30,4 +30,13 @@ export type {
   ReportsSocketClientMessage,
   ReportsSocketMessage,
   ReportsSocketState,
+  EncryptedReportsSocketMessage,
 } from './websocket';
+
+export {
+  createReportsCryptoContext,
+  decryptReportsSocketMessage,
+  encodeReportsSocketPlaintext,
+} from './crypto';
+
+export type { ReportsCryptoContext } from './crypto';

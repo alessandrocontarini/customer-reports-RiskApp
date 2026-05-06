@@ -5,8 +5,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 const apiProxyTarget =
   process.env.VITE_API_PROXY_TARGET ?? 'http://127.0.0.1:8000';
 
-const wsProxyTarget =
-  process.env.VITE_WS_PROXY_TARGET ?? 'ws://127.0.0.1:8100';
+const wsProxyTarget = process.env.VITE_WS_PROXY_TARGET ?? 'ws://127.0.0.1:8100';
 
 // https://vite.dev/config/
 export default defineConfig({

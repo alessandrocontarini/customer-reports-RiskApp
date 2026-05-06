@@ -13,8 +13,8 @@ services:
       VITE_API_BASE_PATHS: api
       VITE_REPORT_WS_URL:
       VITE_LOGROCKET_APP_ID:
-      VITE_API_PROXY_TARGET: http://backend:8000
-      VITE_WS_PROXY_TARGET: ws://report-microservice:8100
+      VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET}
+      VITE_WS_PROXY_TARGET: ${VITE_WS_PROXY_TARGET}
     depends_on:
       - backend
       - report-microservice
@@ -24,9 +24,9 @@ services:
     image: postgres:16-alpine
     container_name: riskapp-postgres
     environment:
-      POSTGRES_DB: riskapp
-      POSTGRES_USER: riskapp
-      POSTGRES_PASSWORD: riskapp
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -48,14 +48,14 @@ services:
       - ./backend:/app
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
-      POSTGRES_DB: riskapp
-      POSTGRES_USER: riskapp
-      POSTGRES_PASSWORD: riskapp
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
-      MICROSERVICE_BASE_URL: http://report-microservice:8100
-      INTERNAL_SERVICE_TOKEN: dev-internal-service-token
-      BACKEND_INTERNAL_BASE_URL: http://backend:8000
+      MICROSERVICE_BASE_URL: ${MICROSERVICE_BASE_URL}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN}
+      BACKEND_INTERNAL_BASE_URL: ${BACKEND_INTERNAL_BASE_URL}
     depends_on:
       - postgres
 
@@ -69,9 +69,9 @@ services:
       - ./report_microservice:/app
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
-      BACKEND_BASE_URL: http://backend:8000
-      INTERNAL_SERVICE_TOKEN: dev-internal-service-token
-      REDIS_URL: redis://redis:6379/0
+      BACKEND_BASE_URL: ${BACKEND_BASE_URL}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN}
+      REDIS_URL: ${REDIS_URL}
     depends_on:
       - backend
       - redis
