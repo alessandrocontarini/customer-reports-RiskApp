@@ -339,8 +339,9 @@ def _call_microservice_generate(report: Report) -> None:
         "user_id": report.owner_id,
         "parameters": report.parameters,
         "callback": {
-            "status_url": f"http://127.0.0.1:8000/api/internal/reports/{report.id}/status/"
+            "status_url": f"{settings.BACKEND_INTERNAL_BASE_URL}/api/internal/reports/{report.id}/status/"
         },
+
     }
     try:
         requests.post(

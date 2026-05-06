@@ -1,4 +1,25 @@
 services:
+  frontend:
+    build:
+      context: .
+    container_name: riskapp-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - riskapp_frontend_node_modules:/app/node_modules
+    environment:
+      VITE_API_BASE_URL:
+      VITE_API_BASE_PATHS: api
+      VITE_REPORT_WS_URL:
+      VITE_LOGROCKET_APP_ID:
+      VITE_API_PROXY_TARGET: http://backend:8000
+      VITE_WS_PROXY_TARGET: ws://report-microservice:8100
+    depends_on:
+      - backend
+      - report-microservice
+
+
   postgres:
     image: postgres:16-alpine
     container_name: riskapp-postgres
@@ -32,10 +53,30 @@ services:
       POSTGRES_PASSWORD: riskapp
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
+      MICROSERVICE_BASE_URL: http://report-microservice:8100
+      INTERNAL_SERVICE_TOKEN: dev-internal-service-token
+      BACKEND_INTERNAL_BASE_URL: http://backend:8000
     depends_on:
       - postgres
-      - redis
 
+  report-microservice:
+    build:
+      context: ./report_microservice
+    container_name: riskapp-report-microservice
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./report_microservice:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      BACKEND_BASE_URL: http://backend:8000
+      INTERNAL_SERVICE_TOKEN: dev-internal-service-token
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - backend
+      - redis
 
 volumes:
   riskapp_postgres_data:
+  riskapp_frontend_node_modules:
+
