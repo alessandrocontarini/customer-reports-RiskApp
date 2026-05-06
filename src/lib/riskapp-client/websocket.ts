@@ -7,7 +7,10 @@ export type ReportsSocketState =
   | 'closed';
 
 export type ReportsSocketClientMessage =
-  | { type: 'auth' }
+  | {
+      type: 'auth';
+      public_key?: JsonWebKey;
+    }
   | {
       type: 'subscribe';
       filters: {
@@ -15,10 +18,17 @@ export type ReportsSocketClientMessage =
       };
     };
 
+export type EncryptedReportsSocketMessage = {
+  type: 'encrypted';
+  algorithm: 'RSA-OAEP-256';
+  ciphertext: string;
+};
+
 export type ReportsSocketMessage =
   | { type: 'auth.success'; user: User }
   | { type: 'auth.failed'; error: ApiError }
   | { type: 'subscribed'; filters: unknown }
+  | EncryptedReportsSocketMessage
   | { type: 'report.updated'; report_id: number; status: ReportStatus }
   | {
       type: 'report.ready';

@@ -1,10 +1,11 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "mock-backend-secret-key"
 DEBUG = True
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "backend"]
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -44,12 +45,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if os.environ.get("POSTGRES_DB"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ["POSTGRES_DB"],
+            "USER": os.environ["POSTGRES_USER"],
+            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+            "HOST": os.environ.get("POSTGRES_HOST", "postgres"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+
 
 LANGUAGE_CODE = "it-it"
 TIME_ZONE = "Europe/Rome"
@@ -64,5 +79,10 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_TRUSTED_ORIGINS = ["https://localhost:3000", "http://localhost:3000"]
 
 FRONTEND_ORIGIN = "https://localhost:3000"
-MICROSERVICE_BASE_URL = "http://127.0.0.1:8100"
-INTERNAL_SERVICE_TOKEN = "dev-internal-service-token"
+MICROSERVICE_BASE_URL = os.environ.get("MICROSERVICE_BASE_URL", "http://127.0.0.1:8100")
+INTERNAL_SERVICE_TOKEN = os.environ.get("INTERNAL_SERVICE_TOKEN", "dev-internal-service-token")
+
+BACKEND_INTERNAL_BASE_URL = os.environ.get(
+    "BACKEND_INTERNAL_BASE_URL",
+    "http://127.0.0.1:8000",
+)
