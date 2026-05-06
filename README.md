@@ -188,7 +188,7 @@ docker compose config
 ## Note di sviluppo
 
 - Il backend usa PostgreSQL quando sono presenti le variabili `POSTGRES_*`.
-- Fuori Docker il backend mantiene un fallback SQLite per sviluppo locale.
+- Fuori Docker il backend mantiene un fallback SQLite per sviluppo locale (non lo usa; Django richiede la sua configurazione)
 - Il microservizio usa SQLite solo come database Django minimale; il suo channel layer è Redis.
 - La generazione PDF è ancora mockata nel backend tramite `build_mock_pdf`.
 - La logica reale di generazione report può sostituire il mock senza cambiare il contratto backend-microservizio.
