@@ -10,14 +10,15 @@ from django.middleware.csrf import get_token
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-
+from riskapp_reports_client import ReportsClient, ReportsClientError
 from .models import Entity, Report
 from .pdf import build_mock_pdf
 
-try:
-    import requests
-except ImportError:  # pragma: no cover
-    requests = None
+def _reports_client() -> ReportsClient:
+    return ReportsClient(
+        base_url=settings.MICROSERVICE_BASE_URL,
+        internal_token=settings.INTERNAL_SERVICE_TOKEN,
+    )
 
 
 def _json_body(request: HttpRequest) -> dict:
@@ -331,26 +332,18 @@ def internal_report_status(request: HttpRequest, report_id: int) -> JsonResponse
 
 
 def _call_microservice_generate(report: Report) -> None:
-    if requests is None:
-        return
-    payload = {
-        "report_id": report.id,
-        "entity_id": report.entity_id,
-        "user_id": report.owner_id,
-        "parameters": report.parameters,
-        "callback": {
-            "status_url": f"{settings.BACKEND_INTERNAL_BASE_URL}/api/internal/reports/{report.id}/status/"
-        },
-
-    }
     try:
-        requests.post(
-            f"{settings.MICROSERVICE_BASE_URL}/internal/reports/generate/",
-            json=payload,
-            headers={"Authorization": f"Bearer {settings.INTERNAL_SERVICE_TOKEN}"},
-            timeout=2,
+        _reports_client().generate_report(
+            report_id=report.id,
+            entity_id=report.entity_id,
+            user_id=report.owner_id,
+            parameters=report.parameters,
+            status_url=(
+                f"{settings.BACKEND_INTERNAL_BASE_URL}"
+                f"/api/internal/reports/{report.id}/status/"
+            ),
         )
-    except requests.RequestException:
+    except ReportsClientError:
         report.status = Report.FAILED
         report.error_code = "MICROSERVICE_UNAVAILABLE"
         report.error_message = "Microservizio report non raggiungibile"
@@ -358,15 +351,12 @@ def _call_microservice_generate(report: Report) -> None:
         report.save(update_fields=["status", "error_code", "error_message", "updated_at"])
 
 
+
 def _call_microservice_cancel(report: Report) -> None:
-    if requests is None:
-        return
     try:
-        requests.post(
-            f"{settings.MICROSERVICE_BASE_URL}/internal/reports/{report.id}/cancel/",
-            json={"report_id": report.id, "reason": "Richiesta annullata dall'utente"},
-            headers={"Authorization": f"Bearer {settings.INTERNAL_SERVICE_TOKEN}"},
-            timeout=2,
+        _reports_client().cancel_report(
+            report_id=report.id,
+            reason="Richiesta annullata dall'utente",
         )
-    except requests.RequestException:
+    except ReportsClientError:
         pass

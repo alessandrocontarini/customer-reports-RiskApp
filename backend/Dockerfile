@@ -5,10 +5,13 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY libs/riskapp_reports_client /libs/riskapp_reports_client
+RUN pip install --no-cache-dir -e /libs/riskapp_reports_client
+
+COPY backend/ .
 
 EXPOSE 8000
 
