@@ -48,6 +48,15 @@ export const reportsApi = baseApi.injectEndpoints({
       invalidatesTags: ['Entities'],
     }),
 
+    deleteEntity: builder.mutation<void, number>({
+      query: (entityId) => ({
+        url: entityPaths.detail(entityId),
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Entities'],
+    }),
+
+
 
     getReports: builder.query<ListResponse<Report>, GetReportsRequest | void>({
       query: (params) => ({
@@ -102,4 +111,5 @@ export const {
   useGetReportsQuery,
   useDeleteReportMutation,
   useUpdateEntityMutation,
+  useDeleteEntityMutation,
 } = reportsApi;

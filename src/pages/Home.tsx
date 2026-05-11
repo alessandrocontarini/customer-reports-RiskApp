@@ -20,7 +20,10 @@ import {
   type Entity,
   useCreateEntityMutation,
   useGetEntitiesQuery,
+  useDeleteEntityMutation,
 } from '../services/reports.ts';
+import { DeleteAction } from '../components/common/DeleteAction.tsx';
+
 
 const { Text, Title } = Typography;
 
@@ -37,6 +40,7 @@ export const Home: React.FC = () => {
   const entitiesQuery = useGetEntitiesQuery();
 
   const [createEntity, createEntityState] = useCreateEntityMutation();
+  const [deleteEntity] = useDeleteEntityMutation();
 
   const entities = useMemo(
     () => entitiesQuery.data?.data ?? [],
@@ -63,14 +67,25 @@ export const Home: React.FC = () => {
       key: 'actions',
       width: 160,
       render: (_, entity) => (
-        <Button
-          size="small"
-          type="primary"
-          onClick={() => navigate(`/entities/${entity.id}`)}
-        >
-          Gestisci report
-        </Button>
-      ),
+  <Space>
+    <Button
+      size="small"
+      type="primary"
+      onClick={() => navigate(`/entities/${entity.id}`)}
+    >
+      Gestisci report
+    </Button>
+
+    <DeleteAction
+  title="Eliminare il cliente?"
+  description="Il cliente verrà eliminato se non ha report attivi."
+  onConfirm={() => handleDeleteEntity(entity.id)}
+/>
+
+
+  </Space>
+),
+
     },
   ];
 
@@ -83,6 +98,18 @@ export const Home: React.FC = () => {
       })
       .catch(() => message.error('Creazione cliente non riuscita'));
   };
+
+  const handleDeleteEntity = (entityId: number) => {
+    deleteEntity(entityId)
+      .unwrap()
+      .then(() => {
+        message.success('Cliente eliminato');
+      })
+      .catch(() => {
+        message.error('Eliminazione cliente non riuscita');
+      });
+  };
+
 
   return (
     <AppLayout>

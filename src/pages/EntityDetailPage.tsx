@@ -29,6 +29,7 @@ import {
   useUpdateEntityMutation,
 } from '../services/reports.ts';
 import { useReportsSocket } from '../hooks/useReportsSocket.ts';
+import { DeleteAction } from '../components/common/DeleteAction.tsx';
 
 const { Text, Title } = Typography;
 
@@ -197,21 +198,11 @@ export const EntityDetailPage: React.FC = () => {
           >
             Dettagli
           </Button>
-          <Popconfirm
+          <DeleteAction
             title="Eliminare il report?"
-            description="L'operazione non può essere annullata."
-            okText="Elimina"
-            cancelText="Annulla"
             onConfirm={() => handleDeleteReport(report.id)}
-          >
-            <Button
-              size="small"
-              danger={true}
-              disabled={!['completed', 'cancelled'].includes(report.status)}
-            >
-              Elimina
-            </Button>
-          </Popconfirm>
+            disabled={!['completed', 'cancelled'].includes(report.status)}
+          />
         </Space>
       ),
     },
